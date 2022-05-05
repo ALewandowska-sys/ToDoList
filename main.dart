@@ -1,33 +1,56 @@
 import 'package:flutter/material.dart';
 import './task.dart';
 
-void main() => runApp(MyAplication());
+
+void main() => runApp(MyApp());
+
+
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
+  // This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'To Do Homie',
+      theme: ThemeData(
+        primarySwatch: Colors.deepPurple,
+      ),
+      home: MyAplication(),
+    );
+  }
+}
+
 
 class MyAplication extends StatefulWidget{
   @override
-  State<StatefulWidget> createState() {
-    // TODO: implement createState
-    return StateAplication();
-  }
+  State<StatefulWidget> createState() => StateAplication();
 }
+
+
 
 class StateAplication extends State<MyAplication>{
 
   @override
   Widget build(BuildContext centext){
-    return MaterialApp(
-      home: Scaffold(
+    return Scaffold(
         appBar: AppBar(
           title: Text('To do list'),
         ),
-        body: Column(
-          children: [
-
-            Text('Done'),
-            Task('Some task'),
-          ],
-        ),
-    ),
+        body: Center(child: Text("You don't have a task to do")),
+        floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showModalBottomSheet(
+              context: context,
+              builder: (context) => Container(
+                  height: 60, child: Text('This is a modal bottom sheet'),
+                  ),
+                  );
+        },
+        child: const Icon(Icons.add),
+        backgroundColor: Colors.deepPurple,
+      ),
     );
   }
 }
+
