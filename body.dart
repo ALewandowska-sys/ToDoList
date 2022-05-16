@@ -15,13 +15,20 @@ class MyBody extends State<Body>{
   interior(task){
     if(task.isEmpty){
       return Center(
-        child: Column(
-        children: [
-          Icon(
-            Icons.list_alt,
-          ),
-          Text("List is empty"),
-        ]
+        child: Opacity(
+            opacity: 0.5,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Icon(
+                  Icons.list_alt,
+                  size: 70,
+                ),
+                Text('Add some task',
+                    style: new TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+              ],
+            ),
         ),
       );
     }
