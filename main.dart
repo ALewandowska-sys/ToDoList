@@ -1,5 +1,5 @@
-import './task.dart';
 import 'package:flutter/material.dart';
+import 'body.dart';
 
 void main() => runApp(MyApp());
 
@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'To Do Homie',
       theme: ThemeData(
-        primarySwatch: Colors.blueGrey,
+        primarySwatch: Colors.cyan,
       ),
       home: MyAplication(),
     );
@@ -31,21 +31,31 @@ class StateAplication extends State<MyAplication> {
       appBar: AppBar(
         title: Text('To do list'),
       ),
-      body: Center(
-        child: Text("You don't have a task to do"),
-      ),
+      body: Body(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           showModalBottomSheet(
             context: context,
             builder: (context) => Container(
-              height: 100,
-              child: Text('This is a modal bottom sheet'),
+              color: Colors.cyan[50],
+              child: Column(
+                children: [
+                  const TextField(
+                    decoration: InputDecoration(
+                        border: InputBorder.none,
+                        labelText: 'Enter Title',
+                    ),
+                  ),
+                  TextButton(onPressed: () {},
+                      child: Text("Add"),
+                  )
+                ],
+              ),
             ),
           );
         },
         child: const Icon(Icons.add),
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.cyan[600],
       ),
     );
   }
