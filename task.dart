@@ -21,7 +21,7 @@ class _MyCheck extends State<Check> {
       if (states.any(interactiveStates.contains)) {
         return Colors.blue;
       }
-      return Colors.red;
+      return Colors.grey;
     }
 
     return Checkbox(
@@ -40,12 +40,13 @@ class _MyCheck extends State<Check> {
 class Task extends StatelessWidget{
   final String task;
   Task(this.task);
+
   Widget build(BuildContext context){
     return Container(
       child: Row(
           children: [
             Check(),
-            Text(task)]
+            Text(task, style: TextStyle(fontSize: 20))]
       ),
     );
   }
