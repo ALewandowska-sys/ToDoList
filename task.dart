@@ -1,53 +1,95 @@
 import 'package:flutter/material.dart';
+import 'main.dart';
 
-class Check extends StatefulWidget {
-  const Check({Key? key}) : super(key: key);
+
+class Task extends StatefulWidget{
+  late final String task;
+  Task(this.task);
 
   @override
-  State<Check> createState() => _MyCheck();
+  State<StatefulWidget> createState() => _MyTask(task);
 }
 
-class _MyCheck extends State<Check> {
-  bool isChecked = false;
+
+
+class _MyTask extends State<Task> {
+  final String task;
+  bool _isChecked = false;
+
+  _MyTask(this.task);
+
+  doneText(){
+    return Text(task, style: const TextStyle(
+        fontSize: 22,
+        decoration: TextDecoration.lineThrough,
+        color: Colors.grey),
+    );
+  }
+
+  toDoText(){
+    return Text(task, style: const TextStyle(
+        fontSize: 22,
+        fontWeight: FontWeight.w600,
+        letterSpacing: 0.5),
+    );
+  }
+
+  changeTask(){
+    if(_isChecked == true) {
+      return doneText();
+    }
+    else{
+      return toDoText();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    Color getColor(Set<MaterialState> states) {
-      const Set<MaterialState> interactiveStates = <MaterialState>{
-        MaterialState.pressed,
-        MaterialState.hovered,
-        MaterialState.focused,
-      };
-      if (states.any(interactiveStates.contains)) {
-        return Colors.blue;
-      }
-      return Colors.grey;
-    }
 
-    return Checkbox(
-      checkColor: Colors.white,
-      fillColor: MaterialStateProperty.resolveWith(getColor),
-      value: isChecked,
-      onChanged: (bool? value) {
-        setState(() {
-          isChecked = value!;
-        });
+    return CheckboxListTile(
+      activeColor: Colors.grey,
+      controlAffinity: ListTileControlAffinity.leading,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10)),
+      title: changeTask(),
+      value: _isChecked,
+      onChanged: (value){
+          setState(() {
+            _isChecked = value!;
+            changeTask();
+          });
       },
-    );
-  }
-}
-
-class Task extends StatelessWidget{
-  final String task;
-  Task(this.task);
-
-  Widget build(BuildContext context){
-    return Container(
-      child: Row(
-          children: [
-            Check(),
-            Text(task, style: TextStyle(fontSize: 20))]
+      secondary:  IconButton(
+        icon: const Icon(
+          Icons.delete,
+        ),
+        iconSize: 20,
+        color: Colors.grey,
+        splashColor: Colors.red,
+        onPressed: () {
+          globalTask.removeWhere((element) => element == task);
+        },
       ),
     );
   }
 }
+
+/*
+class MyDone extends StatelessWidget{
+  final String done;
+  MyDone(this.done);
+
+  Widget build(BuildContext context) {
+    return ExpansionTile(
+      title: Text("See done tasks"),
+      children: List.generate(done.length, (indexDone) {
+        return Text(
+            done[indexDone],
+            style: const TextStyle(fontSize: 20,
+                decoration: TextDecoration.lineThrough,
+                color: Colors.grey));
+      },),
+    );
+  }
+}
+*/
