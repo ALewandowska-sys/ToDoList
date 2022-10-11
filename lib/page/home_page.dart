@@ -4,7 +4,7 @@ import 'package:moor_flutter/moor_flutter.dart';
 import 'package:flutter/src/widgets/basic.dart' as basic;
 import 'package:provider/provider.dart';
 
-import '../data/task_moor.dart';
+import '../data/database.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -71,6 +71,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             // database.insertColor(const SelectColorsCompanion(colorName: Value(-334336)));
                             // database.insertColor(const SelectColorsCompanion(colorName: Value(-51967434)));
                             // database.insertColor(const SelectColorsCompanion(colorName: Value(-623098), selected: Value(true)));
+                            // print(database.getColor());
                             taskController.clear();
                           },
                           style: ButtonStyle(

@@ -1,7 +1,9 @@
-import 'package:moor/moor.dart';
+import 'package:database/data/model/select_color_moor.dart';
+import 'package:database/data/model/task_moor.dart';
 import 'package:moor_flutter/moor_flutter.dart';
 
-part 'task_moor.g.dart';
+part 'database.g.dart';
+
 
 // By default, the name of the generated data class will be "Task" (without "s")
 class Tasks extends Table {
@@ -12,7 +14,14 @@ class Tasks extends Table {
 }
 
 
-@UseMoor(tables: [Tasks])
+class SelectColors extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get colorName => integer()();
+  BoolColumn get selected => boolean().withDefault(const Constant(false))();
+}
+
+
+@UseMoor(tables: [Tasks, SelectColors])
 // _$AppDatabase is the name of the generated class
 class AppDatabase extends _$AppDatabase {
   AppDatabase()
@@ -33,6 +42,14 @@ class AppDatabase extends _$AppDatabase {
 
   // Moor supports Streams which emit elements when the watched data changes
   Stream<List<Task>> watchAllTasks() => select(tasks).watch();
+  
+  Stream<List<Task>> watchDoneTasks() => (select(tasks)
+    ..where((tbl) => tbl.selected.equals(true)))
+      .watch();
+
+  Stream<List<Task>> watchToDoTasks() => (select(tasks)
+    ..where((tbl) => tbl.selected.equals(false)))
+      .watch();
 
   Future insertTask(TasksCompanion task) => into(tasks).insert(task);
 
@@ -41,4 +58,13 @@ class AppDatabase extends _$AppDatabase {
 
   Future deleteTask(Task task) => delete(tasks).delete(task);
 
+  Stream<List<SelectColor>> getColor() => (select(selectColors)
+    ..where((tbl) => tbl.selected.equals(true)))
+      .watch();
+
+  Future insertColor(SelectColorsCompanion color) => into(selectColors).insert(color);
+
+  Future updateColor(SelectColor color) => update(selectColors).replace(color);
+
+  Future deleteColor(SelectColor color) => delete(selectColors).delete(color);
 }

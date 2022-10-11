@@ -1,7 +1,8 @@
-import 'package:database/data/task_moor.dart';
 import 'package:database/page/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import 'data/database.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
