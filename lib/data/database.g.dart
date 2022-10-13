@@ -434,3 +434,26 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [tasks, selectColors];
 }
+
+// **************************************************************************
+// DaoGenerator
+// **************************************************************************
+
+mixin _$TaskDaoMixin on DatabaseAccessor<AppDatabase> {
+  $TasksTable get tasks => attachedDatabase.tasks;
+  Selectable<int> totalTasks() {
+    return customSelect('SELECT COUNT(*) FROM tasks;',
+        variables: [],
+        readsFrom: {
+          tasks,
+        }).map((QueryRow row) => row.read<int>('COUNT(*)'));
+  }
+
+  Selectable<int> totalToDo() {
+    return customSelect('SELECT COUNT(*) FROM tasks WHERE selected = false;',
+        variables: [],
+        readsFrom: {
+          tasks,
+        }).map((QueryRow row) => row.read<int>('COUNT(*)'));
+  }
+}

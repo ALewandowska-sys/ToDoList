@@ -42,7 +42,7 @@ class AppDatabase extends _$AppDatabase {
 
   // Moor supports Streams which emit elements when the watched data changes
   Stream<List<Task>> watchAllTasks() => select(tasks).watch();
-  
+
   Stream<List<Task>> watchDoneTasks() => (select(tasks)
     ..where((tbl) => tbl.selected.equals(true)))
       .watch();
@@ -67,4 +67,21 @@ class AppDatabase extends _$AppDatabase {
   Future updateColor(SelectColor color) => update(selectColors).replace(color);
 
   Future deleteColor(SelectColor color) => delete(selectColors).delete(color);
+}
+
+@UseDao(tables: [Tasks],
+    queries: {'totalTasks': 'SELECT COUNT(*) FROM tasks;',
+      'totalToDo': 'SELECT COUNT(*) FROM tasks WHERE selected = false;'})
+class TaskDao extends DatabaseAccessor<AppDatabase> with _$TaskDaoMixin  {
+
+  final AppDatabase database;
+
+  TaskDao(this.database) : super(database);
+
+  Future<int> getTotalRecords() {
+    return totalTasks().getSingle();
+  }
+  Future<int> getToDoRecords() {
+    return totalToDo().getSingle();
+  }
 }

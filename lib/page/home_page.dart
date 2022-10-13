@@ -16,14 +16,22 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
 
   TextEditingController taskController = TextEditingController();
-  final Color color = Colors.cyanAccent;
+
+  Color takeColor(){
+    final database = Provider.of<AppDatabase>(context, listen: false);
+    //  CANT FIND TABLE
+    // SelectColors color = database.getColor().first as SelectColors;
+    // color.colorName as int
+    return Color(-15632662);
+  }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: color,
+      backgroundColor: takeColor(),
       appBar: AppBar(
-        backgroundColor: color,
+        backgroundColor: takeColor(),
         centerTitle: true,
         title: const Text(
           'To do list', style: TextStyle(fontSize: 25, color: Colors.white),
@@ -55,7 +63,9 @@ class _MyHomePageState extends State<MyHomePage> {
                           decoration: InputDecoration(
                             enabledBorder: UnderlineInputBorder(
                               borderSide:
-                              BorderSide(color: color, width: 3),
+                              BorderSide(
+                                  color: takeColor(),
+                                  width: 3),
                             ),
                             labelText: 'Enter Title',
                           ),
@@ -76,7 +86,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           },
                           style: ButtonStyle(
                             backgroundColor: MaterialStateProperty.all<Color>(
-                                color),
+                                takeColor()),
                           ),
                           child: const Text(
                             'Add', style: TextStyle(color: Colors.white),
@@ -88,7 +98,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
           );
         },
-        backgroundColor: color,
+        backgroundColor: takeColor(),
         child: const Icon(Icons.add, color: Colors.white,),
       ),
     );

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:moor_flutter/moor_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/src/widgets/basic.dart' as basic;
 
 import '../data/database.dart';
 
@@ -13,13 +15,13 @@ class Body extends StatefulWidget {
 class StateBody extends State<Body> {
   TextEditingController taskController = TextEditingController();
 
-  done(List doneTask){
+  done(){
     final database = Provider.of<AppDatabase>(context, listen: false);
-
-    return ExpansionTile(
-      title: const Text("See done tasks"),
-      children: [
-        Column(
+    return Expanded(
+        child: basic.Column(
+        children: [
+          ExpansionTile(
+          title: const Text("See done tasks"),
           children:[
             Flexible(
               child: StreamBuilder(
@@ -40,56 +42,68 @@ class StateBody extends State<Body> {
                       );
                     },);
                 },),
-            ),],
-        ),
-      ]);
+            ),
+      ]),
+    ]),
+    );
   }
 
-  toDo(List toDoTask){
-    var howManyTask = toDoTask.length;
+  toDo(){
     final database = Provider.of<AppDatabase>(context, listen: false);
-    return Column(
+    int toDoCount = 0;
+    Selectable<int> total = TaskDao(database).totalToDo();
+    total.getSingle().then((value) => toDoCount = value);
+    return Expanded(
+        child: basic.Column(
         children: [
           Container(
             padding: const EdgeInsets.only(top: 20, left: 10, bottom: 15),
             alignment: const FractionalOffset(0.1, 0.0),
             child: Text(
-              '$howManyTask tasks to do',
+              '$toDoCount tasks to do',
               style: const TextStyle(
                   fontStyle: FontStyle.italic, color: Colors.blueGrey),
             ),
           ),
-          Column(
-            children:[
-              Flexible(
-                child: StreamBuilder(
-                  stream: database.watchAllTasks(),
-                  builder: (context, AsyncSnapshot<List<Task>> snapshot) {
-                  final tasks = snapshot.data ?? [];
-                  return ListView.builder(
-                    itemCount: tasks.length,
-                    itemBuilder: (_, index) {
-                      final itemTask = tasks[index];
-                      return ListTile(
-                        title: Text(itemTask.name, style: const TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0.5),
-                        ),
-                        onLongPress: () => database.deleteTask(itemTask),
+            Expanded(
+              child: basic.Column(
+                children:[
+                  Flexible(
+                    child: StreamBuilder(
+                      stream: database.watchAllTasks(),
+                      builder: (context, AsyncSnapshot<List<Task>> snapshot) {
+                      final tasks = snapshot.data ?? [];
+                      return ListView.builder(
+                        itemCount: tasks.length,
+                        itemBuilder: (_, index) {
+                          final itemTask = tasks[index];
+                          return CheckboxListTile(
+                            title: Text(itemTask.name, style: const TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.w400,
+                                letterSpacing: 0.5),
+                            ),
+                            value: itemTask.selected,
+                            controlAffinity: ListTileControlAffinity.leading,
+                            onChanged: (newValue) {
+                            database.updateTask(itemTask.copyWith(selected: newValue));
+                            },
+                          );
+                        },
                       );
-                    },);
-                  },),
+                      },
+                    ),
                   ),
                 ]),
-        ]
+          ),
+        ])
     );
   }
   empty(){
     return Center(
       child: Opacity(
         opacity: 0.4,
-        child: Column(
+        child: basic.Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: const <Widget>[
@@ -108,57 +122,21 @@ class StateBody extends State<Body> {
 
   Widget createBody() {
     final database = Provider.of<AppDatabase>(context, listen: false);
-    List tasks = [];
-    database.getAllTasks().asStream().forEach((element) { tasks.add(element);});
-    if (!tasks.isEmpty) {
+    int tasks = 8;
+    Selectable<int> total = TaskDao(database).totalTasks();
+    total.getSingle().then((value) => {
+      tasks = value
+    });
+    if (tasks == 0) {
       return empty();
     }
-    else {
-      List<Task> doneTasks = [];
-      List<Task> toDoTasks = [];
-      database.watchAllTasks().forEach((element) {
-        for (var element in element) {
-          if(element.selected){
-            doneTasks.add(element);
-          } else{
-            toDoTasks.add(element);
-          }
-        }
-      });
-      print(tasks);
-      print(doneTasks);
-      print(toDoTasks);
-      return Column(
-          children:[
-            Expanded(child: _buildTaskList(context))
-            ]
-          );
-      //
-      // if (doneTasks.isEmpty || toDoTasks.isNotEmpty) {
-      //   return toDo(toDoTasks);
-      // }
-      // if (doneTasks.isNotEmpty || toDoTasks.isEmpty){
-      //   return done(doneTasks);
-      // }
-      // else{
-      //   return Column(
-      //       children: [
-      //         toDo(toDoTasks),
-      //         done(doneTasks)
-      //       ]
-      //   );
-      // }
+      return basic.Column(
+          children: [
+            toDo(),
+            done()
+          ]
+        );
     }
-  }
-
-
-
-  Color takeColor(){
-    final database = Provider.of<AppDatabase>(context, listen: false);
-    SelectColors color = database.getColor().asStream().first as SelectColors;
-    // color.colorName as int
-    return Color(-623098);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -170,28 +148,10 @@ class StateBody extends State<Body> {
         ),
         color: Colors.white,
       ),
-      child:
-      createBody()
-      // Column(
-      // children:[
-      //   Expanded(child: _buildTaskList(context))
-      //   ]
-      // ),
+      child: createBody()
     );
   }
 
-  // return ListView.builder(
-  //               itemCount: _notesBox.values.length,
-  //               itemBuilder: (BuildContext context, int index) {
-  //                 final todo = tasksBox.getAt(index);
-  //                 return ListTile(
-  //                   title: Text(todo!.content, style: const TextStyle(
-  //                       fontSize: 22,
-  //                       decoration: TextDecoration.lineThrough,
-  //                       color: Colors.grey),),
-  //                   onLongPress: () => tasksBox.deleteAt(index),
-  //                 );
-  //               });
 
   StreamBuilder<List<Task>> _buildTaskList(BuildContext context) {
     final database = Provider.of<AppDatabase>(context, listen: false);
