@@ -58,15 +58,26 @@ class AppDatabase extends _$AppDatabase {
 
   Future deleteTask(Task task) => delete(tasks).delete(task);
 
-  Stream<List<SelectColor>> getColor() => (select(selectColors)
+  Stream<SelectColor> getColor() => (select(selectColors)
     ..where((tbl) => tbl.selected.equals(true)))
-      .watch();
+      .watchSingle();
+
+  Stream<List<SelectColor>> watchSelectColors() => select(selectColors).watch();
 
   Future insertColor(SelectColorsCompanion color) => into(selectColors).insert(color);
 
   Future updateColor(SelectColor color) => update(selectColors).replace(color);
 
   Future deleteColor(SelectColor color) => delete(selectColors).delete(color);
+
+  //INSERT IF DOESN'T EXIST
+// database.insertColor(const SelectColorsCompanion(colorName: Value(-13795108)));
+// database.insertColor(const SelectColorsCompanion(colorName: Value(-2466604)));
+// database.insertColor(const SelectColorsCompanion(colorName: Value(-12856517)));
+// database.insertColor(const SelectColorsCompanion(colorName: Value(-334336)));
+// database.insertColor(const SelectColorsCompanion(colorName: Value(-51967434)));
+// database.insertColor(const SelectColorsCompanion(colorName: Value(-623098), selected: Value(true)));
+
 }
 
 @UseDao(tables: [Tasks],
