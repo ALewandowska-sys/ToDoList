@@ -63,11 +63,12 @@ class _StateBody extends State<Body> {
     if (_tasksCounter == 0) {
       return empty();
     }
-    return basic.Column(
+    return SingleChildScrollView(child: basic.Column(
         children: [
           toDo(),
           done()
         ]
+    ),
     );
   }
 
@@ -93,32 +94,26 @@ class _StateBody extends State<Body> {
   }
 
   done(){
-    return Flexible(
-      child: basic.Column(
-          children: [
-            ExpansionTile(
-                title: const Text("See done tasks"),
-                children:[
-                    dynamicListDone(),
-                ]),
-          ]),
-    );
+    return basic.Column(
+        children: [
+          ExpansionTile(
+              title: const Text("See done tasks"),
+              children:[
+                  dynamicListDone(),
+              ]),
+        ]);
   }
 
   toDo(){
-    return Flexible(
-        child: basic.Column(
-            children: [
-              howManyToDo(),
-              Flexible(
-                child: basic.Column(
-                    children:[
-                        dynamicListToDo(),
-                    ]),
-              )
+    return basic.Column(
+        children: [
+          howManyToDo(),
+            basic.Column(
+                children:[
+                    dynamicListToDo(),
+                ]),
 
-            ])
-    );
+        ]);
   }
 
   howManyToDo(){
@@ -147,6 +142,7 @@ class _StateBody extends State<Body> {
         final tasks = snapshot.data ?? [];
         return ListView.builder(
           shrinkWrap: true,
+          primary: false,
           itemCount: tasks.length,
           itemBuilder: (_, index) {
             final itemTask = tasks[index];
@@ -187,6 +183,7 @@ class _StateBody extends State<Body> {
         final tasks = snapshot.data ?? [];
         return ListView.builder(
           shrinkWrap: true,
+          primary: false,
           itemCount: tasks.length,
           itemBuilder: (_, index) {
             final itemTask = tasks[index];
