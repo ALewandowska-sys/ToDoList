@@ -18,17 +18,9 @@ class _StateBody extends State<Body> {
   int _toDoCounter = 0;
   int _selectColor = -15632662;
 
-  //doesn't work
-  _StateBody(){
-    takeColor().then((value) => setState((){
-      _selectColor = value.colorName;
-    }));
-    getAllCount().then((value) => setState((){
-      _tasksCounter = value;
-    }));
-    getToDoCount().then((value) => setState((){
-      _toDoCounter = value;
-    }));
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   Future<SelectColor> takeColor() async{
@@ -64,7 +56,10 @@ class _StateBody extends State<Body> {
     );
   }
 
-  Widget createBody() {
+  createBody() {
+    getAllCount().then((value) => setState((){
+      _tasksCounter = value;
+    }));
     if (_tasksCounter == 0) {
       return empty();
     }
@@ -98,38 +93,38 @@ class _StateBody extends State<Body> {
   }
 
   done(){
-    return Expanded(
+    return Flexible(
       child: basic.Column(
           children: [
             ExpansionTile(
                 title: const Text("See done tasks"),
                 children:[
-                  Flexible(
-                    child: dynamicListDone(),
-                  ),
+                    dynamicListDone(),
                 ]),
           ]),
     );
   }
 
   toDo(){
-    return Expanded(
+    return Flexible(
         child: basic.Column(
             children: [
               howManyToDo(),
-              Expanded(
+              Flexible(
                 child: basic.Column(
                     children:[
-                      Flexible(
-                        child: dynamicListToDo(),
-                      ),
+                        dynamicListToDo(),
                     ]),
-              ),
+              )
+
             ])
     );
   }
 
   howManyToDo(){
+    getToDoCount().then((value) => setState((){
+      _toDoCounter = value;
+    }));
     return Container(
       padding: const EdgeInsets.only(top: 20, left: 10, bottom: 15),
       alignment: const FractionalOffset(0.1, 0.0),
@@ -142,12 +137,16 @@ class _StateBody extends State<Body> {
   }
 
   dynamicListToDo(){
+    // takeColor().then((value) => setState((){
+    //   _selectColor = value.colorName;
+    // }));
     final database = Provider.of<AppDatabase>(context, listen: false);
     return StreamBuilder(
-      stream: database.watchAllTasks(),
+      stream: database.watchToDoTasks(),
       builder: (context, AsyncSnapshot<List<Task>> snapshot) {
         final tasks = snapshot.data ?? [];
         return ListView.builder(
+          shrinkWrap: true,
           itemCount: tasks.length,
           itemBuilder: (_, index) {
             final itemTask = tasks[index];
@@ -183,13 +182,37 @@ class _StateBody extends State<Body> {
   dynamicListDone(){
     final database = Provider.of<AppDatabase>(context, listen: false);
     return StreamBuilder(
-      stream: database.watchAllTasks(),
+      stream: database.watchDoneTasks(),
       builder: (context, AsyncSnapshot<List<Task>> snapshot) {
         final tasks = snapshot.data ?? [];
         return ListView.builder(
+          shrinkWrap: true,
           itemCount: tasks.length,
           itemBuilder: (_, index) {
             final itemTask = tasks[index];
+            // return CheckboxListTile(
+            //   title: Text(itemTask.name, style: const TextStyle(
+            //       fontSize: 22,
+            //       fontWeight: FontWeight.w400,
+            //       letterSpacing: 0.5),
+            //   ),
+            //   checkboxShape: RoundedRectangleBorder(
+            //       borderRadius: BorderRadius.circular(100)
+            //   ),
+            //   checkColor: Color(_selectColor),
+            //   secondary: IconButton(
+            //     color: Colors.grey,
+            //     icon: const Icon(Icons.delete),
+            //     onPressed: () {
+            //       database.deleteTask(itemTask);
+            //     },
+            //   ),
+            //   value: itemTask.selected,
+            //   controlAffinity: ListTileControlAffinity.leading,
+            //   onChanged: (newValue) {
+            //     database.updateTask(itemTask.copyWith(selected: newValue));
+            //   },
+            // );
             return ListTile(
               title: Text(itemTask.name, style: const TextStyle(
                   fontSize: 22,
@@ -200,10 +223,5 @@ class _StateBody extends State<Body> {
             );
           },);
       },);
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 }
