@@ -19,13 +19,19 @@ class _StateBody extends State<Body> {
   int _selectColor = -15632662;
 
   @override
+  void initState(){
+    super.initState();
+    takeColor().then((value) => setState((){
+      _selectColor = value.colorName;
+    }));
+  }
+  @override
   void dispose() {
     super.dispose();
   }
 
   Future<SelectColor> takeColor() async{
     final database = Provider.of<AppDatabase>(context, listen: false);
-    //  CANT FIND TABLE
     return await database.getColor().first;
   }
 
@@ -45,6 +51,7 @@ class _StateBody extends State<Body> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: MediaQuery.of(context).size.height,
       decoration: const BoxDecoration(
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(40.0),
@@ -94,6 +101,9 @@ class _StateBody extends State<Body> {
   }
 
   done(){
+    if(_tasksCounter == _toDoCounter){
+      return const SizedBox.shrink();
+    }
     return basic.Column(
         children: [
           ExpansionTile(
@@ -132,9 +142,6 @@ class _StateBody extends State<Body> {
   }
 
   dynamicListToDo(){
-    // takeColor().then((value) => setState((){
-    //   _selectColor = value.colorName;
-    // }));
     final database = Provider.of<AppDatabase>(context, listen: false);
     return StreamBuilder(
       stream: database.watchToDoTasks(),
@@ -187,29 +194,6 @@ class _StateBody extends State<Body> {
           itemCount: tasks.length,
           itemBuilder: (_, index) {
             final itemTask = tasks[index];
-            // return CheckboxListTile(
-            //   title: Text(itemTask.name, style: const TextStyle(
-            //       fontSize: 22,
-            //       fontWeight: FontWeight.w400,
-            //       letterSpacing: 0.5),
-            //   ),
-            //   checkboxShape: RoundedRectangleBorder(
-            //       borderRadius: BorderRadius.circular(100)
-            //   ),
-            //   checkColor: Color(_selectColor),
-            //   secondary: IconButton(
-            //     color: Colors.grey,
-            //     icon: const Icon(Icons.delete),
-            //     onPressed: () {
-            //       database.deleteTask(itemTask);
-            //     },
-            //   ),
-            //   value: itemTask.selected,
-            //   controlAffinity: ListTileControlAffinity.leading,
-            //   onChanged: (newValue) {
-            //     database.updateTask(itemTask.copyWith(selected: newValue));
-            //   },
-            // );
             return ListTile(
               title: Text(itemTask.name, style: const TextStyle(
                   fontSize: 22,
