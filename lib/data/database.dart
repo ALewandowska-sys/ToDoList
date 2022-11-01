@@ -4,23 +4,6 @@ import 'package:moor_flutter/moor_flutter.dart';
 
 part 'database.g.dart';
 
-
-// By default, the name of the generated data class will be "Task" (without "s")
-class Tasks extends Table {
-  // autoIncrement automatically sets this to be the primary key
-  IntColumn get id => integer().autoIncrement()();
-  TextColumn get name => text().withLength(min: 1, max: 80)();
-  BoolColumn get selected => boolean().withDefault(const Constant(false))();
-}
-
-
-class SelectColors extends Table {
-  IntColumn get id => integer().autoIncrement()();
-  IntColumn get colorName => integer()();
-  BoolColumn get selected => boolean().withDefault(const Constant(false))();
-}
-
-
 @UseMoor(tables: [Tasks, SelectColors])
 // _$AppDatabase is the name of the generated class
 class AppDatabase extends _$AppDatabase {
@@ -35,7 +18,7 @@ class AppDatabase extends _$AppDatabase {
   // Bump this when changing tables and columns.
   // Migrations will be covered in the next part.
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   // All tables have getters in the generated class - we can select the tasks table
   Future<List<Task>> getAllTasks() => select(tasks).get();
@@ -70,14 +53,36 @@ class AppDatabase extends _$AppDatabase {
 
   Future deleteColor(SelectColor color) => delete(selectColors).delete(color);
 
-  //INSERT IF DOESN'T EXIST
-// database.insertColor(const SelectColorsCompanion(colorName: Value(-13795108)));
-// database.insertColor(const SelectColorsCompanion(colorName: Value(-2466604)));
-// database.insertColor(const SelectColorsCompanion(colorName: Value(-12856517)));
-// database.insertColor(const SelectColorsCompanion(colorName: Value(-334336)));
-// database.insertColor(const SelectColorsCompanion(colorName: Value(-51967434)));
-// database.insertColor(const SelectColorsCompanion(colorName: Value(-623098), selected: Value(true)));
-
+  
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    onCreate: (Migrator m) {
+      return m.createAll();
+    },
+    beforeOpen: (details) async {
+      if (details.wasCreated) {
+        await into(selectColors).insert(const SelectColorsCompanion(
+          colorName: Value(-623098),
+          selected: Value(true)
+        ));
+        await into(selectColors).insert(const SelectColorsCompanion(
+          colorName: Value(-51967434),
+        ));
+        await into(selectColors).insert(const SelectColorsCompanion(
+          colorName: Value(-334336),
+        ));
+        await into(selectColors).insert(const SelectColorsCompanion(
+          colorName: Value(-12856517),
+        ));
+        await into(selectColors).insert(const SelectColorsCompanion(
+          colorName: Value(-2466604),
+        ));
+        await into(selectColors).insert(const SelectColorsCompanion(
+          colorName: Value(-13795108),
+        ));
+      }
+    },
+  );
 }
 
 @UseDao(tables: [Tasks],
