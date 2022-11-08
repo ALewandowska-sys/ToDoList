@@ -429,6 +429,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(SqlTypeSystem.defaultInstance, e);
   late final $TasksTable tasks = $TasksTable(this);
   late final $SelectColorsTable selectColors = $SelectColorsTable(this);
+  late final TaskDao taskDao = TaskDao(this as AppDatabase);
+  late final ColorDao colorDao = ColorDao(this as AppDatabase);
   @override
   Iterable<TableInfo> get allTables => allSchemaEntities.whereType<TableInfo>();
   @override
@@ -456,4 +458,7 @@ mixin _$TaskDaoMixin on DatabaseAccessor<AppDatabase> {
           tasks,
         }).map((QueryRow row) => row.read<int>('COUNT(*)'));
   }
+}
+mixin _$ColorDaoMixin on DatabaseAccessor<AppDatabase> {
+  $SelectColorsTable get selectColors => attachedDatabase.selectColors;
 }

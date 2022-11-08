@@ -32,7 +32,8 @@ class _StateBody extends State<Body> {
 
   Future<SelectColor> takeColor() async{
     final database = Provider.of<AppDatabase>(context, listen: false);
-    return await database.getColor().first;
+    Stream<SelectColor> color = ColorDao(database).getColor();
+    return await color.first;
   }
 
   Future<int> getAllCount() async{
@@ -64,6 +65,9 @@ class _StateBody extends State<Body> {
   }
 
   createBody() {
+    takeColor().then((value) => setState((){
+      _selectColor = value.colorName;
+    }));
     getAllCount().then((value) => setState((){
       _tasksCounter = value;
     }));
@@ -144,7 +148,7 @@ class _StateBody extends State<Body> {
   dynamicListToDo(){
     final database = Provider.of<AppDatabase>(context, listen: false);
     return StreamBuilder(
-      stream: database.watchToDoTasks(),
+      stream: TaskDao(database).watchToDoTasks(),
       builder: (context, AsyncSnapshot<List<Task>> snapshot) {
         final tasks = snapshot.data ?? [];
         return ListView.builder(
@@ -167,13 +171,13 @@ class _StateBody extends State<Body> {
                 color: Colors.grey,
                 icon: const Icon(Icons.delete),
                 onPressed: () {
-                  database.deleteTask(itemTask);
+                  TaskDao(database).deleteTask(itemTask);
                 },
               ),
               value: itemTask.selected,
               controlAffinity: ListTileControlAffinity.leading,
               onChanged: (newValue) {
-                database.updateTask(itemTask.copyWith(selected: newValue));
+                TaskDao(database).updateTask(itemTask.copyWith(selected: newValue));
               },
             );
           },
@@ -185,7 +189,7 @@ class _StateBody extends State<Body> {
   dynamicListDone(){
     final database = Provider.of<AppDatabase>(context, listen: false);
     return StreamBuilder(
-      stream: database.watchDoneTasks(),
+      stream: TaskDao(database).watchDoneTasks(),
       builder: (context, AsyncSnapshot<List<Task>> snapshot) {
         final tasks = snapshot.data ?? [];
         return ListView.builder(
@@ -200,7 +204,7 @@ class _StateBody extends State<Body> {
                   decoration: TextDecoration.lineThrough,
                   color: Colors.grey),
               ),
-              onLongPress: () => database.deleteTask(itemTask),
+              onLongPress: () => TaskDao(database).deleteTask(itemTask),
             );
           },);
       },);

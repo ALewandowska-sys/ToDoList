@@ -26,8 +26,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<SelectColor> takeColor() async{
     final database = Provider.of<AppDatabase>(context, listen: false);
-    //  CANT FIND TABLE
-    return await database.getColor().first;
+    Stream<SelectColor> color = ColorDao(database).getColor();
+    return await color.first;
   }
 
   @override
@@ -62,7 +62,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return TextButton(
       onPressed: () {
         final database = Provider.of<AppDatabase>(context, listen: false);
-        database.insertTask(TasksCompanion(name: Value(taskController.text)));
+        TaskDao(database).insertTask(TasksCompanion(name: Value(taskController.text)));
         taskController.clear();
       },
       style: ButtonStyle(

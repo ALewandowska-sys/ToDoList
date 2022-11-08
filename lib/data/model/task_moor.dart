@@ -1,7 +1,6 @@
 import 'package:moor/moor.dart';
 import 'package:moor_flutter/moor_flutter.dart';
 
-// By default, the name of the generated data class will be "Task" (without "s")
 class Tasks extends Table {
   // autoIncrement automatically sets this to be the primary key
   IntColumn get id => integer().autoIncrement()();
