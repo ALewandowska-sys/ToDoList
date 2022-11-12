@@ -1,12 +1,12 @@
-import 'package:database/data/model/select_color_moor.dart';
+import 'package:database/data/model/theme_moor.dart';
 import 'package:database/data/model/task_moor.dart';
 import 'package:moor_flutter/moor_flutter.dart';
 
 part 'database.g.dart';
 
-@UseMoor(tables: [Tasks, SelectColors], daos: [TaskDao, ColorDao])
-class AppDatabase extends _$AppDatabase {
-  AppDatabase()
+@UseMoor(tables: [ThemeColors, Tasks], daos: [TaskDao, ThemeColorsDao])
+class MoorDatabase extends _$MoorDatabase {
+  MoorDatabase()
       : super(FlutterQueryExecutor.inDatabaseFolder(
     path: 'db.sqlite',
     // Good for debugging - prints SQL in the console
@@ -23,25 +23,31 @@ class AppDatabase extends _$AppDatabase {
     },
     beforeOpen: (details) async {
       if (details.wasCreated) {
-        await into(selectColors).insert(const SelectColorsCompanion(
+        await into(themeColors).insert(const ThemeColorsCompanion(
             colorName: Value(-623098),
             selected: Value(true)
         ));
-        await into(selectColors).insert(const SelectColorsCompanion(
+        await into(themeColors).insert(const ThemeColorsCompanion(
           colorName: Value(-51967434),
         ));
-        await into(selectColors).insert(const SelectColorsCompanion(
+        await into(themeColors).insert(const ThemeColorsCompanion(
           colorName: Value(-334336),
         ));
-        await into(selectColors).insert(const SelectColorsCompanion(
+        await into(themeColors).insert(const ThemeColorsCompanion(
           colorName: Value(-12856517),
         ));
-        await into(selectColors).insert(const SelectColorsCompanion(
+        await into(themeColors).insert(const ThemeColorsCompanion(
           colorName: Value(-2466604),
         ));
-        await into(selectColors).insert(const SelectColorsCompanion(
+        await into(themeColors).insert(const ThemeColorsCompanion(
           colorName: Value(-13795108),
         ));
+      }
+    },
+    onUpgrade: (Migrator m, int from, int to) async {
+      if (from == 1) {
+        m.createTable(tasks);
+        m.createTable(themeColors);
       }
     },
   );
@@ -50,9 +56,9 @@ class AppDatabase extends _$AppDatabase {
 @UseDao(tables: [Tasks],
     queries: {'totalTasks': 'SELECT COUNT(*) FROM tasks;',
       'totalToDo': 'SELECT COUNT(*) FROM tasks WHERE selected = false;'})
-class TaskDao extends DatabaseAccessor<AppDatabase> with _$TaskDaoMixin  {
+class TaskDao extends DatabaseAccessor<MoorDatabase> with _$TaskDaoMixin  {
 
-  final AppDatabase database;
+  final MoorDatabase database;
 
   TaskDao(this.database) : super(database);
 
@@ -84,23 +90,27 @@ class TaskDao extends DatabaseAccessor<AppDatabase> with _$TaskDaoMixin  {
   Future deleteTask(Task task) => delete(tasks).delete(task);
 }
 
-@UseDao(tables: [SelectColors])
-class ColorDao extends DatabaseAccessor<AppDatabase> with _$ColorDaoMixin  {
+@UseDao(tables: [ThemeColors], queries: {'color': 'SELECT color_name FROM theme_colors WHERE selected = true;'})
+class ThemeColorsDao extends DatabaseAccessor<MoorDatabase> with _$ThemeColorsDaoMixin  {
 
-  final AppDatabase database;
+  final MoorDatabase database;
 
-  ColorDao(this.database) : super(database);
+  ThemeColorsDao(this.database) : super(database);
 
-  Stream<SelectColor> getColor() => (select(selectColors)
+  Future<int> getColorQuery(){
+    return color().getSingle();
+  }
+
+  Stream<ThemeColor> getColor() => (select(themeColors)
     ..where((tbl) => tbl.selected.equals(true)))
       .watchSingle();
 
-  Stream<List<SelectColor>> watchSelectColors() => select(selectColors).watch();
+  Stream<List<ThemeColor>> watchSelectColors() => select(themeColors).watch();
 
-  Future insertColor(SelectColorsCompanion color) => into(selectColors).insert(color);
+  Future insertColor(ThemeColorsCompanion themeCompanion) => into(themeColors).insert(themeCompanion);
 
-  Future updateColor(SelectColor color) => update(selectColors).replace(color);
+  Future updateColor(ThemeColor themeColor) => update(themeColors).replace(themeColor);
 
-  Future deleteColor(SelectColor color) => delete(selectColors).delete(color);
+  Future deleteColor(ThemeColor themeColor) => delete(themeColors).delete(themeColor);
 
 }
