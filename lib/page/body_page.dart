@@ -13,7 +13,6 @@ class Body extends StatefulWidget {
 }
 
 class _StateBody extends State<Body> {
-  TextEditingController taskController = TextEditingController();
   int _tasksCounter = 0;
   int _toDoCounter = 0;
   int _selectColor = -15632662;
@@ -21,33 +20,36 @@ class _StateBody extends State<Body> {
   @override
   void initState(){
     super.initState();
-    takeColor().then((value) => setState((){
-      _selectColor = value.colorName;
-    }));
+    getAllCount().then((value) => _tasksCounter = value);
+    getToDoCount().then((value) => _toDoCounter = value);
+    takeColor().then((value) => _selectColor = value);
   }
   @override
   void dispose() {
     super.dispose();
   }
 
-  Future<SelectColor> takeColor() async{
-    final database = Provider.of<AppDatabase>(context, listen: false);
-    Stream<SelectColor> color = ColorDao(database).getColor();
-    return await color.first;
+  Future<int> takeColor() async{
+    final database = Provider.of<MoorDatabase>(context, listen: false);
+    Future<int> total = ThemeColorsDao(database).getColorQuery();
+    return await total;
   }
 
   Future<int> getAllCount() async{
-    final database = Provider.of<AppDatabase>(context, listen: false);
+    final database = Provider.of<MoorDatabase>(context, listen: false);
     Selectable<int> total = TaskDao(database).totalTasks();
     return await total.getSingle();
   }
 
   Future<int> getToDoCount() async{
-    final database = Provider.of<AppDatabase>(context, listen: false);
+    final database = Provider.of<MoorDatabase>(context, listen: false);
     Selectable<int> total = TaskDao(database).totalToDo();
     return await total.getSingle();
   }
-
+  reloadData(){
+    getToDoCount().then((value) => _toDoCounter = value);
+    getAllCount().then((value) => _tasksCounter = value);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,12 +67,7 @@ class _StateBody extends State<Body> {
   }
 
   createBody() {
-    takeColor().then((value) => setState((){
-      _selectColor = value.colorName;
-    }));
-    getAllCount().then((value) => setState((){
-      _tasksCounter = value;
-    }));
+    reloadData();
     if (_tasksCounter == 0) {
       return empty();
     }
@@ -131,9 +128,6 @@ class _StateBody extends State<Body> {
   }
 
   howManyToDo(){
-    getToDoCount().then((value) => setState((){
-      _toDoCounter = value;
-    }));
     return Container(
       padding: const EdgeInsets.only(top: 20, left: 10, bottom: 15),
       alignment: const FractionalOffset(0.1, 0.0),
@@ -146,7 +140,7 @@ class _StateBody extends State<Body> {
   }
 
   dynamicListToDo(){
-    final database = Provider.of<AppDatabase>(context, listen: false);
+    final database = Provider.of<MoorDatabase>(context, listen: false);
     return StreamBuilder(
       stream: TaskDao(database).watchToDoTasks(),
       builder: (context, AsyncSnapshot<List<Task>> snapshot) {
@@ -187,7 +181,7 @@ class _StateBody extends State<Body> {
   }
 
   dynamicListDone(){
-    final database = Provider.of<AppDatabase>(context, listen: false);
+    final database = Provider.of<MoorDatabase>(context, listen: false);
     return StreamBuilder(
       stream: TaskDao(database).watchDoneTasks(),
       builder: (context, AsyncSnapshot<List<Task>> snapshot) {
@@ -204,7 +198,9 @@ class _StateBody extends State<Body> {
                   decoration: TextDecoration.lineThrough,
                   color: Colors.grey),
               ),
-              onLongPress: () => TaskDao(database).deleteTask(itemTask),
+              onLongPress: () => {
+                TaskDao(database).deleteTask(itemTask)
+              }
             );
           },);
       },);

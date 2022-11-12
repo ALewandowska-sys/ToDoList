@@ -18,16 +18,20 @@ class _MyHomePageState extends State<MyHomePage> {
   TextEditingController taskController = TextEditingController();
   int _selectColor = -15632662;
 
-  _MyHomePageState(){
-    takeColor().then((value) => setState((){
-      _selectColor = value.colorName;
-    }));
+  @override
+  void initState(){
+    super.initState();
+    takeColor().then((value) => _selectColor = value);
+  }
+  @override
+  void dispose() {
+    super.dispose();
   }
 
-  Future<SelectColor> takeColor() async{
-    final database = Provider.of<AppDatabase>(context, listen: false);
-    Stream<SelectColor> color = ColorDao(database).getColor();
-    return await color.first;
+  Future<int> takeColor() async{
+    final database = Provider.of<MoorDatabase>(context, listen: false);
+    Future<int> color = ThemeColorsDao(database).getColorQuery();
+    return await color;
   }
 
   @override
@@ -61,7 +65,7 @@ class _MyHomePageState extends State<MyHomePage> {
   addNewTask() {
     return TextButton(
       onPressed: () {
-        final database = Provider.of<AppDatabase>(context, listen: false);
+        final database = Provider.of<MoorDatabase>(context, listen: false);
         TaskDao(database).insertTask(TasksCompanion(name: Value(taskController.text)));
         taskController.clear();
       },

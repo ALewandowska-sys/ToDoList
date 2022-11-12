@@ -15,8 +15,8 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return Provider<AppDatabase>(
-      create: (context) => AppDatabase(),
+    return Provider<MoorDatabase>(
+      create: (context) => MoorDatabase(),
       child: MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
