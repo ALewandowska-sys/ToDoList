@@ -31,8 +31,8 @@ class _StateBody extends State<Body> {
 
   Future<int> takeColor() async{
     final database = Provider.of<MoorDatabase>(context, listen: false);
-    Future<int> total = ThemeColorsDao(database).getColorQuery();
-    return await total;
+    Future<int> color = ThemeColorsDao(database).getColorQuery();
+    return await color;
   }
 
   Future<int> getAllCount() async{
@@ -47,7 +47,11 @@ class _StateBody extends State<Body> {
     return await total.getSingle();
   }
   reloadData(){
-    getToDoCount().then((value) => _toDoCounter = value);
+    getToDoCount().then((value) => (){
+      setState(() {
+        _toDoCounter = value;
+      });
+    });
     getAllCount().then((value) => _tasksCounter = value);
   }
 
@@ -67,7 +71,6 @@ class _StateBody extends State<Body> {
   }
 
   createBody() {
-    reloadData();
     if (_tasksCounter == 0) {
       return empty();
     }
@@ -132,6 +135,7 @@ class _StateBody extends State<Body> {
       padding: const EdgeInsets.only(top: 20, left: 10, bottom: 15),
       alignment: const FractionalOffset(0.1, 0.0),
       child: Text(
+        //TODO: where i have to take reloadData()?
         '$_toDoCounter tasks to do',
         style: const TextStyle(
             fontStyle: FontStyle.italic, color: Colors.blueGrey),

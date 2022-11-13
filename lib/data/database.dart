@@ -14,41 +14,33 @@ class MoorDatabase extends _$MoorDatabase {
   ));
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onCreate: (Migrator m) {
       return m.createAll();
     },
-    beforeOpen: (details) async {
-      if (details.wasCreated) {
-        await into(themeColors).insert(const ThemeColorsCompanion(
-            colorName: Value(-623098),
-            selected: Value(true)
-        ));
-        await into(themeColors).insert(const ThemeColorsCompanion(
-          colorName: Value(-51967434),
-        ));
-        await into(themeColors).insert(const ThemeColorsCompanion(
-          colorName: Value(-334336),
-        ));
-        await into(themeColors).insert(const ThemeColorsCompanion(
-          colorName: Value(-12856517),
-        ));
-        await into(themeColors).insert(const ThemeColorsCompanion(
-          colorName: Value(-2466604),
-        ));
-        await into(themeColors).insert(const ThemeColorsCompanion(
-          colorName: Value(-13795108),
-        ));
-      }
-    },
     onUpgrade: (Migrator m, int from, int to) async {
-      if (from == 1) {
-        m.createTable(tasks);
-        m.createTable(themeColors);
-      }
+      await into(themeColors).insert(const ThemeColorsCompanion(
+          colorName: Value(-623098),
+          selected: Value(true)
+      ));
+      await into(themeColors).insert(const ThemeColorsCompanion(
+        colorName: Value(-51967434),
+      ));
+      await into(themeColors).insert(const ThemeColorsCompanion(
+        colorName: Value(-334336),
+      ));
+      await into(themeColors).insert(const ThemeColorsCompanion(
+        colorName: Value(-12856517),
+      ));
+      await into(themeColors).insert(const ThemeColorsCompanion(
+        colorName: Value(-2466604),
+      ));
+      await into(themeColors).insert(const ThemeColorsCompanion(
+        colorName: Value(-13795108),
+      ));
     },
   );
 }
@@ -62,12 +54,10 @@ class TaskDao extends DatabaseAccessor<MoorDatabase> with _$TaskDaoMixin  {
 
   TaskDao(this.database) : super(database);
 
-  Future<int> getTotalRecords() {
-    return totalTasks().getSingle();
-  }
-  Future<int> getToDoRecords() {
-    return totalToDo().getSingle();
-  }
+  Future<int> getTotalRecords() => totalTasks().getSingle();
+
+  Future<int> getToDoRecords() => totalToDo().getSingle();
+
   // All tables have getters in the generated class - we can select the tasks table
   Future<List<Task>> getAllTasks() => select(tasks).get();
 
@@ -90,20 +80,17 @@ class TaskDao extends DatabaseAccessor<MoorDatabase> with _$TaskDaoMixin  {
   Future deleteTask(Task task) => delete(tasks).delete(task);
 }
 
-@UseDao(tables: [ThemeColors], queries: {'color': 'SELECT color_name FROM theme_colors WHERE selected = true;'})
+@UseDao(tables: [ThemeColors], queries: {'countQuery': 'SELECT COUNT(*) FROM theme_colors;',
+  'color': 'SELECT color_name FROM theme_colors WHERE selected = true;'})
 class ThemeColorsDao extends DatabaseAccessor<MoorDatabase> with _$ThemeColorsDaoMixin  {
 
   final MoorDatabase database;
 
   ThemeColorsDao(this.database) : super(database);
 
-  Future<int> getColorQuery(){
-    return color().getSingle();
-  }
+  Future<int> count() => countQuery().getSingle();
 
-  Stream<ThemeColor> getColor() => (select(themeColors)
-    ..where((tbl) => tbl.selected.equals(true)))
-      .watchSingle();
+  Future<int> getColorQuery() => color().getSingle();
 
   Stream<List<ThemeColor>> watchSelectColors() => select(themeColors).watch();
 
