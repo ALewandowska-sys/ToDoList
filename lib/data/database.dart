@@ -54,9 +54,9 @@ class TaskDao extends DatabaseAccessor<MoorDatabase> with _$TaskDaoMixin  {
 
   TaskDao(this.database) : super(database);
 
-  Future<int> getTotalRecords() => totalTasks().getSingle();
+  Stream<int> getTotalRecords() => totalTasks().watchSingle();
 
-  Future<int> getToDoRecords() => totalToDo().getSingle();
+  Stream<int> getToDoRecords() => totalToDo().watchSingle();
 
   // All tables have getters in the generated class - we can select the tasks table
   Future<List<Task>> getAllTasks() => select(tasks).get();

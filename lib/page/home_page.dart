@@ -55,7 +55,7 @@ class _MyHomePageState extends State<MyHomePage> {
       backgroundColor: Color(_selectColor),
       centerTitle: true,
       title: const Text(
-        'To do list', style: TextStyle(fontSize: 25, color: Colors.white),
+        'To do list', style: TextStyle(fontSize: 30, color: Colors.white),
       ),
       elevation: 0,
       //   actions: const [Settings()],

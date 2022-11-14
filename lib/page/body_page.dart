@@ -13,15 +13,11 @@ class Body extends StatefulWidget {
 }
 
 class _StateBody extends State<Body> {
-  int _tasksCounter = 0;
-  int _toDoCounter = 0;
   int _selectColor = -15632662;
 
   @override
   void initState(){
     super.initState();
-    getAllCount().then((value) => _tasksCounter = value);
-    getToDoCount().then((value) => _toDoCounter = value);
     takeColor().then((value) => _selectColor = value);
   }
   @override
@@ -33,26 +29,6 @@ class _StateBody extends State<Body> {
     final database = Provider.of<MoorDatabase>(context, listen: false);
     Future<int> color = ThemeColorsDao(database).getColorQuery();
     return await color;
-  }
-
-  Future<int> getAllCount() async{
-    final database = Provider.of<MoorDatabase>(context, listen: false);
-    Selectable<int> total = TaskDao(database).totalTasks();
-    return await total.getSingle();
-  }
-
-  Future<int> getToDoCount() async{
-    final database = Provider.of<MoorDatabase>(context, listen: false);
-    Selectable<int> total = TaskDao(database).totalToDo();
-    return await total.getSingle();
-  }
-  reloadData(){
-    getToDoCount().then((value) => (){
-      setState(() {
-        _toDoCounter = value;
-      });
-    });
-    getAllCount().then((value) => _tasksCounter = value);
   }
 
   @override
@@ -71,15 +47,29 @@ class _StateBody extends State<Body> {
   }
 
   createBody() {
-    if (_tasksCounter == 0) {
-      return empty();
-    }
-    return SingleChildScrollView(child: basic.Column(
-        children: [
-          toDo(),
-          done()
-        ]
-    ),
+    final database = Provider.of<MoorDatabase>(context, listen: false);
+    return StreamBuilder<int>(
+      stream: TaskDao(database).totalTasks().watchSingle(),
+      builder: (
+          BuildContext context,
+          AsyncSnapshot<int> snapshot,
+          ) {
+        final totalTasksCount = snapshot.data;
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator();
+        } else {
+          if (totalTasksCount == 0 || totalTasksCount == null) {
+            return empty();
+          } else {
+            return SingleChildScrollView(child: basic.Column(
+                children: [
+                  toDo(),
+                  done()
+                ]
+            ),);
+          }
+        }
+      },
     );
   }
 
@@ -105,38 +95,51 @@ class _StateBody extends State<Body> {
   }
 
   done(){
-    if(_tasksCounter == _toDoCounter){
-      return const SizedBox.shrink();
-    }
-    return basic.Column(
-        children: [
-          ExpansionTile(
-              title: const Text("See done tasks"),
-              children:[
-                  dynamicListDone(),
-              ]),
-        ]);
+    final database = Provider.of<MoorDatabase>(context, listen: false);
+    return StreamBuilder(
+        stream: TaskDao(database).watchDoneTasks(),
+        builder: (context, AsyncSnapshot<List<Task>> snapshot) {
+        final doneTasks = snapshot.data ?? [];
+        if(doneTasks.isEmpty){
+          return const SizedBox.shrink();
+        }
+        return ExpansionTile(
+            title: const Text("See done tasks"),
+            children:[
+              dynamicListDone(database, doneTasks)
+            ]
+        );
+        },
+    );
   }
 
   toDo(){
-    return basic.Column(
-        children: [
-          howManyToDo(),
-            basic.Column(
-                children:[
-                    dynamicListToDo(),
-                ]),
-
-        ]);
+    final database = Provider.of<MoorDatabase>(context, listen: false);
+    return StreamBuilder<int>(
+        stream: TaskDao(database).totalToDo().watchSingle(),
+        builder: (context, AsyncSnapshot<int> snapshot) {
+          final toDoTasksCount = snapshot.data;
+          if(toDoTasksCount == 0){
+            return const SizedBox.shrink();
+          }
+          return basic.Column(
+              children: [
+                howManyToDo(toDoTasksCount),
+                basic.Column(
+                    children:[
+                      dynamicListToDo(),
+                    ]),
+              ]);
+        }
+    );
   }
 
-  howManyToDo(){
+  howManyToDo(toDoTasksCount){
     return Container(
       padding: const EdgeInsets.only(top: 20, left: 10, bottom: 15),
       alignment: const FractionalOffset(0.1, 0.0),
       child: Text(
-        //TODO: where i have to take reloadData()?
-        '$_toDoCounter tasks to do',
+        '$toDoTasksCount tasks to do',
         style: const TextStyle(
             fontStyle: FontStyle.italic, color: Colors.blueGrey),
       ),
@@ -144,59 +147,54 @@ class _StateBody extends State<Body> {
   }
 
   dynamicListToDo(){
-    final database = Provider.of<MoorDatabase>(context, listen: false);
-    return StreamBuilder(
-      stream: TaskDao(database).watchToDoTasks(),
-      builder: (context, AsyncSnapshot<List<Task>> snapshot) {
-        final tasks = snapshot.data ?? [];
-        return ListView.builder(
-          shrinkWrap: true,
-          primary: false,
-          itemCount: tasks.length,
-          itemBuilder: (_, index) {
-            final itemTask = tasks[index];
-            return CheckboxListTile(
-              title: Text(itemTask.name, style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w400,
-                  letterSpacing: 0.5),
-              ),
-              checkboxShape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(100)
-              ),
-              checkColor: Color(_selectColor),
-              secondary: IconButton(
-                color: Colors.grey,
-                icon: const Icon(Icons.delete),
-                onPressed: () {
-                  TaskDao(database).deleteTask(itemTask);
+      final database = Provider.of<MoorDatabase>(context, listen: false);
+      return StreamBuilder(
+        stream: TaskDao(database).watchToDoTasks(),
+        builder: (context, AsyncSnapshot<List<Task>> snapshot) {
+          final tasks = snapshot.data ?? [];
+          return ListView.builder(
+            shrinkWrap: true,
+            primary: false,
+            itemCount: tasks.length,
+            itemBuilder: (_, index) {
+              final itemTask = tasks[index];
+              return CheckboxListTile(
+                title: Text(itemTask.name, style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w400,
+                    letterSpacing: 0.5),
+                ),
+                checkboxShape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(100)
+                ),
+                activeColor: Color(_selectColor),
+                secondary: IconButton(
+                  color: Colors.grey,
+                  icon: const Icon(Icons.delete),
+                  onPressed: () {
+                    TaskDao(database).deleteTask(itemTask);
+                  },
+                ),
+                value: itemTask.selected,
+                controlAffinity: ListTileControlAffinity.leading,
+                onChanged: (newValue) {
+                  TaskDao(database).updateTask(itemTask.copyWith(selected: newValue));
                 },
-              ),
-              value: itemTask.selected,
-              controlAffinity: ListTileControlAffinity.leading,
-              onChanged: (newValue) {
-                TaskDao(database).updateTask(itemTask.copyWith(selected: newValue));
-              },
-            );
-          },
-        );
-      },
-    );
-  }
+              );
+            },
+          );
+        },
+      );
+    }
 
-  dynamicListDone(){
-    final database = Provider.of<MoorDatabase>(context, listen: false);
-    return StreamBuilder(
-      stream: TaskDao(database).watchDoneTasks(),
-      builder: (context, AsyncSnapshot<List<Task>> snapshot) {
-        final tasks = snapshot.data ?? [];
-        return ListView.builder(
-          shrinkWrap: true,
-          primary: false,
-          itemCount: tasks.length,
-          itemBuilder: (_, index) {
-            final itemTask = tasks[index];
-            return ListTile(
+  dynamicListDone(database, doneTasks){
+      return ListView.builder(
+        shrinkWrap: true,
+        primary: false,
+        itemCount: doneTasks.length,
+        itemBuilder: (_, index) {
+          final itemTask = doneTasks[index];
+          return ListTile(
               title: Text(itemTask.name, style: const TextStyle(
                   fontSize: 22,
                   decoration: TextDecoration.lineThrough,
@@ -204,9 +202,8 @@ class _StateBody extends State<Body> {
               ),
               onLongPress: () => {
                 TaskDao(database).deleteTask(itemTask)
-              }
-            );
-          },);
-      },);
-  }
+              });
+        },
+      );
+    }
 }
