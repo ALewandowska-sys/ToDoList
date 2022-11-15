@@ -27,7 +27,7 @@ class _StateBody extends State<Body> {
 
   Future<int> takeColor() async{
     final database = Provider.of<MoorDatabase>(context, listen: false);
-    Future<int> color = ThemeColorsDao(database).getColorQuery();
+    Future<int> color = ThemeColorsDao(database).getColorQuery().first;
     return await color;
   }
 

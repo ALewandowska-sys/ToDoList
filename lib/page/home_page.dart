@@ -1,4 +1,5 @@
 import 'package:database/page/body_page.dart';
+import 'package:database/page/setting_page.dart';
 import 'package:flutter/material.dart';
 import 'package:moor_flutter/moor_flutter.dart';
 import 'package:flutter/src/widgets/basic.dart' as basic;
@@ -30,7 +31,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<int> takeColor() async{
     final database = Provider.of<MoorDatabase>(context, listen: false);
-    Future<int> color = ThemeColorsDao(database).getColorQuery();
+    Future<int> color = ThemeColorsDao(database).getColorQuery().first;
     return await color;
   }
 
@@ -58,7 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
         'To do list', style: TextStyle(fontSize: 30, color: Colors.white),
       ),
       elevation: 0,
-      //   actions: const [Settings()],
+        actions: const [SettingPage()],
     );
   }
 

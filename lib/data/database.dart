@@ -22,25 +22,27 @@ class MoorDatabase extends _$MoorDatabase {
       return m.createAll();
     },
     onUpgrade: (Migrator m, int from, int to) async {
-      await into(themeColors).insert(const ThemeColorsCompanion(
-          colorName: Value(-623098),
-          selected: Value(true)
-      ));
-      await into(themeColors).insert(const ThemeColorsCompanion(
-        colorName: Value(-51967434),
-      ));
-      await into(themeColors).insert(const ThemeColorsCompanion(
-        colorName: Value(-334336),
-      ));
-      await into(themeColors).insert(const ThemeColorsCompanion(
-        colorName: Value(-12856517),
-      ));
-      await into(themeColors).insert(const ThemeColorsCompanion(
-        colorName: Value(-2466604),
-      ));
-      await into(themeColors).insert(const ThemeColorsCompanion(
-        colorName: Value(-13795108),
-      ));
+      if(from == 3){
+        await into(themeColors).insert(const ThemeColorsCompanion(
+            colorName: Value(-623098),
+            selected: Value(true)
+        ));
+        await into(themeColors).insert(const ThemeColorsCompanion(
+          colorName: Value(-51967434),
+        ));
+        await into(themeColors).insert(const ThemeColorsCompanion(
+          colorName: Value(-334336),
+        ));
+        await into(themeColors).insert(const ThemeColorsCompanion(
+          colorName: Value(-12856517),
+        ));
+        await into(themeColors).insert(const ThemeColorsCompanion(
+          colorName: Value(-2466604),
+        ));
+        await into(themeColors).insert(const ThemeColorsCompanion(
+          colorName: Value(-13795108),
+        ));
+      }
     },
   );
 }
@@ -80,17 +82,14 @@ class TaskDao extends DatabaseAccessor<MoorDatabase> with _$TaskDaoMixin  {
   Future deleteTask(Task task) => delete(tasks).delete(task);
 }
 
-@UseDao(tables: [ThemeColors], queries: {'countQuery': 'SELECT COUNT(*) FROM theme_colors;',
-  'color': 'SELECT color_name FROM theme_colors WHERE selected = true;'})
+@UseDao(tables: [ThemeColors], queries: {'color': 'SELECT color_name FROM theme_colors WHERE selected = true;'})
 class ThemeColorsDao extends DatabaseAccessor<MoorDatabase> with _$ThemeColorsDaoMixin  {
 
   final MoorDatabase database;
 
   ThemeColorsDao(this.database) : super(database);
 
-  Future<int> count() => countQuery().getSingle();
-
-  Future<int> getColorQuery() => color().getSingle();
+  Stream<int> getColorQuery() => color().watchSingle();
 
   Stream<List<ThemeColor>> watchSelectColors() => select(themeColors).watch();
 
