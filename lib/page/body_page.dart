@@ -6,30 +6,16 @@ import 'package:flutter/src/widgets/basic.dart' as basic;
 import '../data/database.dart';
 
 class Body extends StatefulWidget {
-  const Body({super.key});
+  final int color;
+  const Body(
+      {Key? key, required this.color})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _StateBody();
 }
 
 class _StateBody extends State<Body> {
-  int _selectColor = -15632662;
-
-  @override
-  void initState(){
-    super.initState();
-    takeColor().then((value) => _selectColor = value);
-  }
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  Future<int> takeColor() async{
-    final database = Provider.of<MoorDatabase>(context, listen: false);
-    Future<int> color = ThemeColorsDao(database).getColorQuery().first;
-    return await color;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -167,7 +153,7 @@ class _StateBody extends State<Body> {
                 checkboxShape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(100)
                 ),
-                activeColor: Color(_selectColor),
+                activeColor: Color(widget.color),
                 secondary: IconButton(
                   color: Colors.grey,
                   icon: const Icon(Icons.delete),

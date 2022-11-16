@@ -15,109 +15,97 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
   TextEditingController taskController = TextEditingController();
-  int _selectColor = -15632662;
-
-  @override
-  void initState(){
-    super.initState();
-    takeColor().then((value) => _selectColor = value);
-  }
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  Future<int> takeColor() async{
-    final database = Provider.of<MoorDatabase>(context, listen: false);
-    Future<int> color = ThemeColorsDao(database).getColorQuery().first;
-    return await color;
-  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Color(_selectColor),
-      appBar: title(),
-      body: const Body(),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          bottomSheet();
-        },
-        backgroundColor: Color(_selectColor),
-        child: const Icon(Icons.add, color: Colors.white,),
-      ),
-    );
+    final database = Provider.of<MoorDatabase>(context, listen: false);
+    return StreamBuilder<int>(
+        stream: ThemeColorsDao(database).getColorQuery(),
+        builder: (context, AsyncSnapshot<int> snapshot) {
+          var color = snapshot.data;
+          color ??= -15632662;
+          return Scaffold(
+            backgroundColor: Color(color),
+            appBar: title(color),
+            body: Body(color: color),
+            floatingActionButton: FloatingActionButton(
+              onPressed: () {
+                bottomSheet(color);
+              },
+              backgroundColor: Color(color),
+              child: const Icon(
+                Icons.add,
+                color: Colors.white,
+              ),
+            ),
+          );
+        });
   }
 
-  title() {
+  title(color) {
     return AppBar(
-      backgroundColor: Color(_selectColor),
+      backgroundColor: Color(color),
       centerTitle: true,
       title: const Text(
-        'To do list', style: TextStyle(fontSize: 30, color: Colors.white),
+        'To do list',
+        style: TextStyle(fontSize: 30, color: Colors.white),
       ),
       elevation: 0,
-        actions: const [SettingPage()],
+      actions: const [SettingPage()],
     );
   }
 
-  addNewTask() {
+  addNewTask(color) {
     return TextButton(
       onPressed: () {
         final database = Provider.of<MoorDatabase>(context, listen: false);
-        TaskDao(database).insertTask(TasksCompanion(name: Value(taskController.text)));
+        TaskDao(database)
+            .insertTask(TasksCompanion(name: Value(taskController.text)));
         taskController.clear();
       },
       style: ButtonStyle(
-        backgroundColor: MaterialStateProperty.all<Color>(
-            Color(_selectColor)),
+        backgroundColor: MaterialStateProperty.all<Color>(Color(color)),
       ),
       child: const Text(
-        'Add', style: TextStyle(color: Colors.white),
+        'Add',
+        style: TextStyle(color: Colors.white),
       ),
     );
   }
 
-  taskTitleLabel() {
+  taskTitleLabel(color) {
     return TextField(
       style: const TextStyle(fontSize: 20),
       controller: taskController,
       decoration: InputDecoration(
         enabledBorder: UnderlineInputBorder(
-          borderSide:
-          BorderSide(
-              color: Color(_selectColor),
-              width: 3),
+          borderSide: BorderSide(color: Color(color), width: 3),
         ),
         labelText: 'Enter Title',
       ),
     );
   }
 
-  Future bottomSheet() {
+  Future bottomSheet(color) {
     return showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      builder: (context) =>
-          Padding(
-            padding: MediaQuery
-                .of(context)
-                .viewInsets,
-            child: Container(
-              padding: const EdgeInsets.all(30.0),
-              child: basic.Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  taskTitleLabel(),
-                  addNewTask(),
-                  const SizedBox(height: 20),
-                ],
-              ),
-            ),
+      builder: (context) => Padding(
+        padding: MediaQuery.of(context).viewInsets,
+        child: Container(
+          padding: const EdgeInsets.all(30.0),
+          child: basic.Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              taskTitleLabel(color),
+              addNewTask(color),
+              const SizedBox(height: 20),
+            ],
           ),
+        ),
+      ),
     );
   }
 }

@@ -5,7 +5,6 @@ import 'package:flutter/src/widgets/basic.dart' as basic;
 
 import '../data/database.dart';
 
-
 class SettingPage extends StatefulWidget {
   const SettingPage({super.key});
 
@@ -14,24 +13,27 @@ class SettingPage extends StatefulWidget {
 }
 
 class _SettingPageState extends State<SettingPage> {
-
   @override
   Widget build(BuildContext context) {
     return IconButton(
       icon: const Icon(Icons.settings),
       color: Colors.white,
-      //padding: const EdgeInsets.only(right: 20),
+      padding: const EdgeInsets.only(right: 20),
       tooltip: 'Settings',
-      onPressed: (){
-        Navigator.push(context, MaterialPageRoute<void>(
-          builder: (BuildContext context) {
-            return newPage();
-          },
-        ),);
-      },);
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute<void>(
+            builder: (BuildContext context) {
+              return newPage();
+            },
+          ),
+        );
+      },
+    );
   }
 
-  Widget newPage() {
+  newPage() {
     final database = Provider.of<MoorDatabase>(context, listen: false);
     return StreamBuilder<int>(
         stream: ThemeColorsDao(database).getColorQuery(),
@@ -39,9 +41,14 @@ class _SettingPageState extends State<SettingPage> {
           var color = snapshot.data;
           color ??= -15632662;
           return Scaffold(
+            backgroundColor: Color(color),
             appBar: AppBar(
+              centerTitle: true,
               backgroundColor: Color(color),
-              title: const Text('Settings'),
+              title: const Text(
+                  'Settings', style: TextStyle(fontSize: 30)
+              ),
+              elevation: 0
             ),
             body: Container(
               height: MediaQuery.of(context).size.height,
@@ -52,14 +59,13 @@ class _SettingPageState extends State<SettingPage> {
                 ),
                 color: Colors.white,
               ),
-              child: Column(
-                children:[
-                  const Text('Choose color theme', style: TextStyle(
-                    fontSize: 30),
-                  ),
-                  chooseColor(),
-                ]
-              ),
+              child: Column(children: [
+                const Text(
+                  'Choose color theme',
+                  style: TextStyle(fontSize: 25),
+                ),
+                chooseColor(),
+              ]),
             ),
           );
         });
@@ -84,21 +90,24 @@ class _SettingPageState extends State<SettingPage> {
                   },
                 );
               });
-          });
+        });
   }
 
   void changeStateOfColors(ThemeColor color, List<ThemeColor> colors) {
     final database = Provider.of<MoorDatabase>(context, listen: false);
-    for(ThemeColor colorFromDB in colors){
-      if(colorFromDB == color){
-        ThemeColorsDao(database).updateColor(colorFromDB.copyWith(selected: true));
+    for (ThemeColor colorFromDB in colors) {
+      if (colorFromDB == color) {
+        ThemeColorsDao(database)
+            .updateColor(colorFromDB.copyWith(selected: true));
+      } else {
+        ThemeColorsDao(database)
+            .updateColor(colorFromDB.copyWith(selected: false));
       }
-      ThemeColorsDao(database).updateColor(colorFromDB.copyWith(selected: false));
     }
   }
 
   iconState(ThemeColor color) {
-    if(color.selected){
+    if (color.selected) {
       return Icon(
         Icons.check_circle,
         size: 130,
