@@ -81,10 +81,15 @@ class _StateBody extends State<Body> {
           return const SizedBox.shrink();
         }
         return Padding(
-          padding: const EdgeInsets.only(left: 15),
-          child: ExpansionTile(
-              title: const Text("See done tasks"),
+          padding: const EdgeInsets.only(left: 15, right: 15),
+          child: Theme(
+            data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+            child: ExpansionTile(
+              textColor: Colors.blueGrey,
+              iconColor: Colors.blueGrey,
+              title: const Text("Done tasks"),
               children: [dynamicListDone(database, doneTasks)]),
+          ),
         );
       },
     );

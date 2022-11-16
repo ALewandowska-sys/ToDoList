@@ -67,20 +67,24 @@ class _SettingPageState extends State<SettingPage> {
         stream: ThemeColorsDao(database).watchSelectColors(),
         builder: (context, AsyncSnapshot<List<ThemeColor>> snapshot) {
           final colors = snapshot.data ?? [];
-          return GridView.builder(
-              shrinkWrap: true,
-              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                  maxCrossAxisExtent: 150),
-              itemCount: colors.length,
-              itemBuilder: (BuildContext ctx, index) {
-                return IconButton(
-                  icon: iconState(colors[index]),
-                  onPressed: () {
-                    ThemeColorsDao(database).deleteColor(colors[index]);
-                    // changeStateOfColors(colors[index], colors);
-                  },
-                );
-              });
+          return Padding(
+            padding: const EdgeInsets.all(15),
+            child: GridView.builder(
+                shrinkWrap: true,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                ),
+                itemCount: colors.length,
+                itemBuilder: (BuildContext ctx, index) {
+                  return IconButton(
+                    icon: iconState(colors[index]),
+                    onPressed: () {
+                      // ThemeColorsDao(database).deleteColor(colors[index]);
+                      changeStateOfColors(colors[index], colors);
+                    },
+                  );
+                }),
+          );
         });
   }
 
@@ -101,13 +105,13 @@ class _SettingPageState extends State<SettingPage> {
     if (color.selected) {
       return Icon(
         Icons.check_circle,
-        size: 130,
+        size: 110,
         color: Color(color.colorName),
       );
     }
     return Icon(
       Icons.circle,
-      size: 130,
+      size: 110,
       color: Color(color.colorName),
     );
   }
