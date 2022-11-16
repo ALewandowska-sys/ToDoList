@@ -18,12 +18,12 @@ class MyApp extends StatelessWidget {
     return Provider<MoorDatabase>(
       create: (context) => MoorDatabase(),
       child: MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        home: const MyHomePage(),
       ),
-      home: const MyHomePage(),
-    ),
     );
   }
 }

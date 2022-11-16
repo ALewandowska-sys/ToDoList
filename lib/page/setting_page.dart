@@ -43,13 +43,10 @@ class _SettingPageState extends State<SettingPage> {
           return Scaffold(
             backgroundColor: Color(color),
             appBar: AppBar(
-              centerTitle: true,
-              backgroundColor: Color(color),
-              title: const Text(
-                  'Settings', style: TextStyle(fontSize: 30)
-              ),
-              elevation: 0
-            ),
+                centerTitle: true,
+                backgroundColor: Color(color),
+                title: const Text('Settings', style: TextStyle(fontSize: 30)),
+                elevation: 0),
             body: Container(
               height: MediaQuery.of(context).size.height,
               decoration: const BoxDecoration(

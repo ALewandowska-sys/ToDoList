@@ -8,50 +8,50 @@ part 'database.g.dart';
 class MoorDatabase extends _$MoorDatabase {
   MoorDatabase()
       : super(FlutterQueryExecutor.inDatabaseFolder(
-    path: 'db.sqlite',
-    // Good for debugging - prints SQL in the console
-    logStatements: true,
-  ));
+          path: 'db.sqlite',
+          // Good for debugging - prints SQL in the console
+          logStatements: true,
+        ));
 
   @override
   int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
-    onCreate: (Migrator m) {
-      return m.createAll();
-    },
-    onUpgrade: (Migrator m, int from, int to) async {
-      if(from == 3){
-        await into(themeColors).insert(const ThemeColorsCompanion(
-            colorName: Value(-623098),
-            selected: Value(true)
-        ));
-        await into(themeColors).insert(const ThemeColorsCompanion(
-          colorName: Value(-51967434),
-        ));
-        await into(themeColors).insert(const ThemeColorsCompanion(
-          colorName: Value(-334336),
-        ));
-        await into(themeColors).insert(const ThemeColorsCompanion(
-          colorName: Value(-12856517),
-        ));
-        await into(themeColors).insert(const ThemeColorsCompanion(
-          colorName: Value(-2466604),
-        ));
-        await into(themeColors).insert(const ThemeColorsCompanion(
-          colorName: Value(-13795108),
-        ));
-      }
-    },
-  );
+        onCreate: (Migrator m) {
+          return m.createAll();
+        },
+        onUpgrade: (Migrator m, int from, int to) async {
+          if (from == 3) {
+            await into(themeColors).insert(const ThemeColorsCompanion(
+                colorName: Value(-623098), selected: Value(true)));
+            await into(themeColors).insert(const ThemeColorsCompanion(
+              colorName: Value(-51967434),
+            ));
+            await into(themeColors).insert(const ThemeColorsCompanion(
+              colorName: Value(-334336),
+            ));
+            await into(themeColors).insert(const ThemeColorsCompanion(
+              colorName: Value(-12856517),
+            ));
+            await into(themeColors).insert(const ThemeColorsCompanion(
+              colorName: Value(-2466604),
+            ));
+            await into(themeColors).insert(const ThemeColorsCompanion(
+              colorName: Value(-13795108),
+            ));
+          }
+        },
+      );
 }
 
-@UseDao(tables: [Tasks],
-    queries: {'totalTasks': 'SELECT COUNT(*) FROM tasks;',
-      'totalToDo': 'SELECT COUNT(*) FROM tasks WHERE selected = false;'})
-class TaskDao extends DatabaseAccessor<MoorDatabase> with _$TaskDaoMixin  {
-
+@UseDao(tables: [
+  Tasks
+], queries: {
+  'totalTasks': 'SELECT COUNT(*) FROM tasks;',
+  'totalToDo': 'SELECT COUNT(*) FROM tasks WHERE selected = false;'
+})
+class TaskDao extends DatabaseAccessor<MoorDatabase> with _$TaskDaoMixin {
   final MoorDatabase database;
 
   TaskDao(this.database) : super(database);
@@ -66,13 +66,11 @@ class TaskDao extends DatabaseAccessor<MoorDatabase> with _$TaskDaoMixin  {
   // Moor supports Streams which emit elements when the watched data changes
   Stream<List<Task>> watchAllTasks() => select(tasks).watch();
 
-  Stream<List<Task>> watchDoneTasks() => (select(tasks)
-    ..where((tbl) => tbl.selected.equals(true)))
-      .watch();
+  Stream<List<Task>> watchDoneTasks() =>
+      (select(tasks)..where((tbl) => tbl.selected.equals(true))).watch();
 
-  Stream<List<Task>> watchToDoTasks() => (select(tasks)
-    ..where((tbl) => tbl.selected.equals(false)))
-      .watch();
+  Stream<List<Task>> watchToDoTasks() =>
+      (select(tasks)..where((tbl) => tbl.selected.equals(false))).watch();
 
   Future insertTask(TasksCompanion task) => into(tasks).insert(task);
 
@@ -82,9 +80,13 @@ class TaskDao extends DatabaseAccessor<MoorDatabase> with _$TaskDaoMixin  {
   Future deleteTask(Task task) => delete(tasks).delete(task);
 }
 
-@UseDao(tables: [ThemeColors], queries: {'color': 'SELECT color_name FROM theme_colors WHERE selected = true;'})
-class ThemeColorsDao extends DatabaseAccessor<MoorDatabase> with _$ThemeColorsDaoMixin  {
-
+@UseDao(tables: [
+  ThemeColors
+], queries: {
+  'color': 'SELECT color_name FROM theme_colors WHERE selected = true;'
+})
+class ThemeColorsDao extends DatabaseAccessor<MoorDatabase>
+    with _$ThemeColorsDaoMixin {
   final MoorDatabase database;
 
   ThemeColorsDao(this.database) : super(database);
@@ -93,10 +95,12 @@ class ThemeColorsDao extends DatabaseAccessor<MoorDatabase> with _$ThemeColorsDa
 
   Stream<List<ThemeColor>> watchSelectColors() => select(themeColors).watch();
 
-  Future insertColor(ThemeColorsCompanion themeCompanion) => into(themeColors).insert(themeCompanion);
+  Future insertColor(ThemeColorsCompanion themeCompanion) =>
+      into(themeColors).insert(themeCompanion);
 
-  Future updateColor(ThemeColor themeColor) => update(themeColors).replace(themeColor);
+  Future updateColor(ThemeColor themeColor) =>
+      update(themeColors).replace(themeColor);
 
-  Future deleteColor(ThemeColor themeColor) => delete(themeColors).delete(themeColor);
-
+  Future deleteColor(ThemeColor themeColor) =>
+      delete(themeColors).delete(themeColor);
 }
