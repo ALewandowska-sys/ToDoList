@@ -1,5 +1,6 @@
-import 'package:moor/moor.dart';
-import 'package:moor_flutter/moor_flutter.dart';
+import 'package:drift/drift.dart';
+import 'package:drift_sqflite/drift_sqflite.dart';
+import 'package:drift/drift.dart';
 
 class ThemeColors extends Table {
   IntColumn get id => integer().autoIncrement()();

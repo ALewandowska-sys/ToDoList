@@ -48,16 +48,15 @@ class _SettingPageState extends State<SettingPage> {
                 title: const Text('Settings', style: TextStyle(fontSize: 30)),
                 elevation: 0),
             body: Container(
-              height: MediaQuery.of(context).size.height,
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(40.0),
-                  topRight: Radius.circular(40.0),
+                height: MediaQuery.of(context).size.height,
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(40.0),
+                    topRight: Radius.circular(40.0),
+                  ),
+                  color: Colors.white,
                 ),
-                color: Colors.white,
-              ),
-              child: chooseColor()
-            ),
+                child: chooseColor()),
           );
         });
   }

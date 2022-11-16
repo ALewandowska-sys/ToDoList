@@ -1,14 +1,15 @@
 import 'package:database/data/model/theme_moor.dart';
 import 'package:database/data/model/task_moor.dart';
 import 'package:flutter/services.dart';
-import 'package:moor_flutter/moor_flutter.dart';
+import 'package:drift_sqflite/drift_sqflite.dart';
+import 'package:drift/drift.dart';
 
 part 'database.g.dart';
 
-@UseMoor(tables: [ThemeColors, Tasks], daos: [TaskDao, ThemeColorsDao])
+@DriftDatabase(tables: [ThemeColors, Tasks], daos: [TaskDao, ThemeColorsDao])
 class MoorDatabase extends _$MoorDatabase {
   MoorDatabase()
-      : super(FlutterQueryExecutor.inDatabaseFolder(
+      : super(SqfliteQueryExecutor.inDatabaseFolder(
           path: 'db.sqlite',
           // Good for debugging - prints SQL in the console
           logStatements: true,
@@ -49,7 +50,7 @@ class MoorDatabase extends _$MoorDatabase {
       );
 }
 
-@UseDao(tables: [
+@DriftAccessor(tables: [
   Tasks
 ], queries: {
   'totalTasks': 'SELECT COUNT(*) FROM tasks;',
@@ -84,7 +85,7 @@ class TaskDao extends DatabaseAccessor<MoorDatabase> with _$TaskDaoMixin {
   Future deleteTask(Task task) => delete(tasks).delete(task);
 }
 
-@UseDao(tables: [
+@DriftAccessor(tables: [
   ThemeColors
 ], queries: {
   'color': 'SELECT color_name FROM theme_colors WHERE selected = true;'

@@ -1,7 +1,8 @@
 import 'package:database/page/body_page.dart';
 import 'package:database/page/setting_page.dart';
 import 'package:flutter/material.dart';
-import 'package:moor_flutter/moor_flutter.dart';
+import 'package:drift_sqflite/drift_sqflite.dart';
+import 'package:drift/drift.dart';
 import 'package:flutter/src/widgets/basic.dart' as basic;
 import 'package:provider/provider.dart';
 

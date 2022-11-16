@@ -80,9 +80,12 @@ class _StateBody extends State<Body> {
         if (doneTasks.isEmpty) {
           return const SizedBox.shrink();
         }
-        return ExpansionTile(
-            title: const Text("See done tasks"),
-            children: [dynamicListDone(database, doneTasks)]);
+        return Padding(
+          padding: const EdgeInsets.only(left: 15),
+          child: ExpansionTile(
+              title: const Text("See done tasks"),
+              children: [dynamicListDone(database, doneTasks)]),
+        );
       },
     );
   }
@@ -96,12 +99,15 @@ class _StateBody extends State<Body> {
           if (toDoTasksCount == 0) {
             return const SizedBox.shrink();
           }
-          return basic.Column(children: [
-            howManyToDo(toDoTasksCount),
-            basic.Column(children: [
-              dynamicListToDo(),
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 20),
+            child: basic.Column(children: [
+              howManyToDo(toDoTasksCount),
+              basic.Column(children: [
+                dynamicListToDo(),
+              ]),
             ]),
-          ]);
+          );
         });
   }
 
