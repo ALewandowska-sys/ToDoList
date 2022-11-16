@@ -56,13 +56,7 @@ class _SettingPageState extends State<SettingPage> {
                 ),
                 color: Colors.white,
               ),
-              child: Column(children: [
-                const Text(
-                  'Choose color theme',
-                  style: TextStyle(fontSize: 25),
-                ),
-                chooseColor(),
-              ]),
+              child: chooseColor()
             ),
           );
         });
@@ -83,7 +77,8 @@ class _SettingPageState extends State<SettingPage> {
                 return IconButton(
                   icon: iconState(colors[index]),
                   onPressed: () {
-                    changeStateOfColors(colors[index], colors);
+                    ThemeColorsDao(database).deleteColor(colors[index]);
+                    // changeStateOfColors(colors[index], colors);
                   },
                 );
               });

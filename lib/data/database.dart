@@ -1,5 +1,6 @@
 import 'package:database/data/model/theme_moor.dart';
 import 'package:database/data/model/task_moor.dart';
+import 'package:flutter/services.dart';
 import 'package:moor_flutter/moor_flutter.dart';
 
 part 'database.g.dart';
@@ -14,15 +15,15 @@ class MoorDatabase extends _$MoorDatabase {
         ));
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
-        onCreate: (Migrator m) {
-          return m.createAll();
+        onCreate: (Migrator m) async {
+          await m.createAll();
         },
-        onUpgrade: (Migrator m, int from, int to) async {
-          if (from == 3) {
+        beforeOpen: (OpeningDetails details) async {
+          if (details.wasCreated) {
             await into(themeColors).insert(const ThemeColorsCompanion(
                 colorName: Value(-623098), selected: Value(true)));
             await into(themeColors).insert(const ThemeColorsCompanion(
@@ -41,6 +42,9 @@ class MoorDatabase extends _$MoorDatabase {
               colorName: Value(-13795108),
             ));
           }
+        },
+        onUpgrade: (Migrator m, int from, int to) async {
+          if (from == 1) {}
         },
       );
 }
