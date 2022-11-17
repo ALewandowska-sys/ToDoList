@@ -79,7 +79,6 @@ class _SettingPageState extends State<SettingPage> {
                   return IconButton(
                     icon: iconState(colors[index]),
                     onPressed: () {
-                      // ThemeColorsDao(database).deleteColor(colors[index]);
                       changeStateOfColors(colors[index], colors);
                     },
                   );
