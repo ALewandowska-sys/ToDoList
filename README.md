@@ -19,9 +19,10 @@ I saw many solutions of To Do app with no-relationship DB like Hive too. It's sh
 <!-- show how -->
 
 ## How it works?
-![add](https://user-images.githubusercontent.com/82601472/209866043-3e58c8b0-53b2-4365-8acf-fb125d35fb67.png)   
-![check](https://user-images.githubusercontent.com/82601472/209865045-88bd46b9-8b16-414a-b28b-3e8b0d32c8a1.png)   
-![colors](https://user-images.githubusercontent.com/82601472/209866209-0daa503c-b540-4a9d-bb10-6b28238f7b2d.png)   
+![add](https://user-images.githubusercontent.com/82601472/209925612-4f15c243-b4d5-46ff-82ad-5a875569e958.png)
+![check](https://user-images.githubusercontent.com/82601472/209925726-7f986506-82ca-45e2-8dbc-7ad3f32be417.png)
+![colors](https://user-images.githubusercontent.com/82601472/209925625-3454d7b5-9615-4dd4-a86f-20575a4a4d80.png)
+
 
 At first we have empty list, but the state of our application is remembering,  
 so changing the color or adding new tasks will be recreated by database in next open.
@@ -29,7 +30,7 @@ so changing the color or adding new tasks will be recreated by database in next 
 ### Change the name of application?
 When I was creating my app I didn't have a right name for it, so I changed it to ,,To Do"   
 ![Zrzut ekranu 2022-11-17 225234](https://user-images.githubusercontent.com/82601472/209869992-62dfb569-e44a-460f-bbf2-b5788300828c.png)   
-![318228250_559533229348441_8932234585893021539_n](https://user-images.githubusercontent.com/82601472/209869986-528be5bb-c101-4f0a-bef1-b6a4fea262f6.jpg)   
+![318228250_559533229348441_8932234585893021539_n](https://user-images.githubusercontent.com/82601472/209925280-b58472c5-524d-4102-8a6c-14dc5053080e.jpg)
 
 ## Is there something to change in this app?
 If you will see something to upgrade/improve, please write a comment :slightly_smiling_face:  
